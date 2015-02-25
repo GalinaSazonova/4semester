@@ -1,7 +1,11 @@
-﻿// Дополнительные сведения о F# см. на http://fsharp.net
-// Дополнительную справку см. в проекте "Учебник по F#".
+﻿let isPalin str =
+    let rec revList acPrevList =
+       match acPrevList with
+       | head::tail -> List.append (revList tail) [head]
+       | [] -> []
+    let directOrder = List.ofArray ((string str).ToCharArray())
+    let backOrder = revList directOrder
+    directOrder = backOrder
 
-[<EntryPoint>]
-let main argv = 
-    printfn "%A" argv
-    0 // возвращение целочисленного кода выхода
+let str = System.Console.ReadLine()
+(isPalin str) |> printfn "%A "
