@@ -1,12 +1,13 @@
-﻿let rec listOfPower check baseList list =
-    if check > 0 then 
-        let check = check - 1
-        let baseList = baseList * 2
-        let list = list @ [baseList]
-        listOfPower check baseList list
-    else list
+﻿let rec listOfPower list =
+    List.map2 (fun x y -> x * y) list [1; 2 ; 4; 8; 16]
 
-let baseList = int <| System.Console.ReadLine ()
-if baseList % 2 = 0 then
-    (listOfPower 4 baseList [baseList]) |> List.iter (fun x -> printfn "%A  " x)
-else printfn "Wrong base"
+let rec involution degree baseResult =
+    if degree >= 1 then
+        involution (degree - 1) (baseResult * 2)
+    else
+        baseResult
+
+printfn "Please, enter degree of 2"
+let degreeOfBaseList = int <| System.Console.ReadLine ()
+let baseList = involution (degreeOfBaseList - 1) 2
+(listOfPower [baseList; baseList; baseList; baseList; baseList]) |> List.iter (fun x -> printf "%A  " x)
