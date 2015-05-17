@@ -5,29 +5,27 @@
     if (openB.Length = revcloseB.Length) then
         List.fold2 (fun acc x y -> if (x = '(' && y = ')') || (x = '[' && y = ']') || (x = '{' && y = '}') then acc else false ) true openB revcloseB
     else false*)
+
+let bracketMatch closingB openingB =
+    match closingB with
+    |')' when openingB = '(' -> true
+    |'}' when openingB = '{' -> true
+    |']' when openingB = '[' -> true
+    | _ -> false
+
 let BracketBalance list =
-    let rec BB list stack =
+    let rec balance list stack =
         match list with
-        |h::t when h = '(' || h = '{' || h ='[' -> BB t (h::stack)
+        |h::t when h = '(' || h = '{' || h ='[' -> balance t (h::stack)
         |h::t ->
             if (stack <> []) then
-                if (h = ')') then
-                    if (stack.Head = '(') then
-                         BB t stack.Tail
-                    else false
-                elif (h = '}') then
-                    if (stack.Head = '{') then
-                        BB t stack.Tail
-                    else false
-                elif (h = ']') then
-                    if (stack.Head = '[') then
-                        BB t stack.Tail
-                    else false
-                else BB t stack
+                if (bracketMatch h stack.Head) then
+                       balance t stack.Tail
+                else false
              else false
         |[] -> stack = []
     let stack = []
-    BB list stack
+    balance list stack
 
 printfn ("Please, enter line of brackets")
 let str = System.Console.ReadLine()

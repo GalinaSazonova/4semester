@@ -5,7 +5,6 @@ let FindByNumber (listNames:List<string>) (listNumbers:List<string>) number =
     List.filter (fun (x, y) -> y = number) (List.zip listNames listNumbers)
 
 let ZipTwoLists (list1:List<string>) (list2:List<string>) =
- // List.fold2 (fun acc a b -> a.ToString() + b.ToString()) [] list1 list2
     (List.zip list1 list2) |> List.fold(fun acc (a, b) -> a::b::acc) []
 
 
@@ -31,42 +30,47 @@ let ListOfName list =
 
 
 let rec Interactive listOfNames listOfPhones = 
-    printfn ("Enter number, please
+    printfn "Enter number, please
     0 - exit
     1 - add contact
     2 - find number by name
     3 - find name by number
     4 - save data to file
-    5 - read data from file")
+    5 - read data from file"
     let taskN = int <| System.Console.ReadLine()
 
     match taskN with
     | 0 -> printfn "End working of phonebook, unsaved changes are deleted"
-    | 1 -> printfn ("Please, write name")
+    | 1 -> printfn "Please, write name"
            let name = System.Console.ReadLine() 
-           printfn ("Please, write number")
+           printfn "Please, write number"
            let number = System.Console.ReadLine()
            Interactive (name::listOfNames) (number::listOfPhones)
-    | 2 -> printfn ("Please, write name of contact")
+    | 2 -> printfn "Please, write name of contact"
            let name = System.Console.ReadLine()
-           (FindByName listOfNames listOfPhones name) |> printfn("%A")
+           (FindByName listOfNames listOfPhones name) |> List.iter(fun x -> printf "%A" x)
+           printfn ""
            Interactive listOfNames listOfPhones
-    | 3 -> printfn ("Please, write number of contact")
+    | 3 -> printfn "Please, write number of contact"
            let number = System.Console.ReadLine()
-           (FindByNumber listOfNames listOfPhones number) |> printfn("%A")  
+           (FindByNumber listOfNames listOfPhones number) |> List.iter(fun x -> printf "%A" x)  
+           printfn ""
            Interactive listOfNames listOfPhones          
-    | 4 -> printfn ("Data has been saved")
+    | 4 -> printfn "Data has been saved"
            //System.IO.File.Delete(@"..\Debug\test.txt")
            let a = System.IO.StreamWriter(@"..\Debug\test.txt")
            (List.zip listOfNames listOfPhones) |> List.iter(fun (x, y) -> a.WriteLine(x)
                                                                           a.WriteLine(y))
            a.Close()
            Interactive listOfNames listOfPhones
-    | 5 -> printfn ("Data has been loaded")
+    | 5 -> printfn "Data has been loaded"
            let list = System.IO.File.ReadLines(@"..\Debug\test.txt") |> Seq.toList
            Interactive (ListOfName list) (ListOfNumber list)
     | _ -> Interactive listOfNames listOfPhones
 
-
-let list = System.IO.File.ReadLines(@"..\Debug\test.txt") |> Seq.toList
-Interactive (ListOfName list) (ListOfNumber list)
+if (System.IO.File.Exists(@"..\Debug\test.txt")) then
+    let list = System.IO.File.ReadLines(@"..\Debug\test.txt") |> Seq.toList
+    Interactive (ListOfName list) (ListOfNumber list)
+else 
+    System.IO.File.Create(@"..\Debug\test.txt") |> ignore
+    Interactive [] []

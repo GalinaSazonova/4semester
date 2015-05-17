@@ -7,7 +7,7 @@ let divide y =
 
 type rounding (rounder:int) =
     member this.Bind ((x : float), (rest : float -> float)) =
-        rest x
+        rest (System.Math.Round (x, rounder))
     member this.Return (x:float) =
         System.Math.Round (x, rounder)
 
