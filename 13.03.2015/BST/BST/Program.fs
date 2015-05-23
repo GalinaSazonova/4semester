@@ -10,7 +10,7 @@ type Tree<'a> =
 type BSTree<'a when 'a:comparison> () =
     let mutable tree = Empty
 
-    member k.treeToList =
+    member k.TreeToList =
         let rec treeToListRec tree =
             match tree with
             |Empty -> []
@@ -20,23 +20,32 @@ type BSTree<'a when 'a:comparison> () =
 
     interface IEnumerable with 
         member v.GetEnumerator() =
-                let list = ref v.treeToList
-                { new IEnumerator with
-                    member t.Current with get() = 
-                         let current = (!list).Head :> obj 
-                         list := (!list).Tail
-                         current
+                let list = ref v.TreeToList
+                if !list = List.Empty then
+                    { new IEnumerator with
+                        member x.Current with get() = null
+                        member x.Reset() = ()
+                        member x.MoveNext() = false
+                    }
+                else
+                    list:= (List.head !list)::!list
+                    { new IEnumerator with
+                        member t.Current with get() = (List.head !list) :> obj
 
-                    member t.MoveNext() = 
-                         match !list with
-                         | [] ->
-                            false
-                         | _ -> 
-                            true 
+                        member t.MoveNext() = 
+                             match !list with
+                             | [] ->
+                                false
+                             | h::t ->
+                                if t = [] then
+                                    false
+                                else
+                                    list := t
+                                    true
                     
-                    member t.Reset() =
-                        list := v.treeToList  
-                }
+                        member t.Reset() =
+                            list := v.TreeToList  
+                    }
 
     member k.Add meaning =
         let rec add meaning tree =
@@ -79,23 +88,23 @@ type BSTree<'a when 'a:comparison> () =
                              |Empty -> Empty
                              |_ -> biggestR r
 
-        let rec remove meaning tree =
+        let rec Remove meaning tree =
             match tree with
             |Empty -> Empty
             |Tip t -> if t = meaning then
                             Empty
                       else
                             tree
-            |Tree(l, m, r) -> if meaning < m then Tree(remove meaning l, m, r)
-                              elif meaning > m then Tree(l, m, remove meaning r)
+            |Tree(l, m, r) -> if meaning < m then Tree(Remove meaning l, m, r)
+                              elif meaning > m then Tree(l, m, Remove meaning r)
                               else match l with
                                    |Empty -> r
                                    |_ -> let t = biggestR l
                                          match t with
-                                         |Tip a -> Tree(remove a l, a, r)
+                                         |Tip a -> Tree(Remove a l, a, r)
 
         if k.ElementIsInTree meaning then
-            tree <- remove meaning tree
+            tree <- Remove meaning tree
         else printfn("There is no such element")
 
 let tree = new BSTree<int>()
@@ -107,9 +116,9 @@ for  i in tree do
     printf "%A " i
 printfn ""
 tree.Remove 8
-printfn("%A") (tree.ElementIsInTree 8)
+printfn "%A" (tree.ElementIsInTree 8)
 for  i in tree do
     printf "%A " i
 printfn ""
 tree.Remove 3
-printfn("%A") (tree.ElementIsInTree 4)
+printfn "%A" (tree.ElementIsInTree 4)
